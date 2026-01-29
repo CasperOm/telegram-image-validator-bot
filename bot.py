@@ -1,14 +1,14 @@
 from telegram.ext import ApplicationBuilder, MessageHandler, filters
 from PIL import Image
 import pytesseract
-import openai
+from openai import OpenAI
 import os
 import shutil
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 
-openai.api_key = OPENAI_KEY
+client = OpenAI(api_key=OPENAI_KEY)
 
 image_store = {}
 
@@ -39,8 +39,7 @@ async def handle_photo(update, context):
 def compare_texts(t1, t2):
     prompt = f"""
 Compare two product lists and quantities.
-Reply:
-Match or Mismatch with details.
+Reply clearly as MATCH or MISMATCH with details.
 
 List1:
 {t1}
@@ -49,11 +48,15 @@ List2:
 {t2}
 """
 
-    resp = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role":"user","content":prompt}]
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
     )
-    return resp.choices[0].message.content
+
+    return response.choices[0].message.content
+
 
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
