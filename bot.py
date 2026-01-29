@@ -3,6 +3,7 @@ from PIL import Image
 import pytesseract
 import openai
 import os
+import shutil
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OPENAI_KEY = os.getenv("OPENAI_KEY")
@@ -10,6 +11,8 @@ OPENAI_KEY = os.getenv("OPENAI_KEY")
 openai.api_key = OPENAI_KEY
 
 image_store = {}
+
+print("Tesseract path:", shutil.which("tesseract"))
 
 async def handle_photo(update, context):
     chat_id = update.message.chat_id
